@@ -16,7 +16,11 @@ public class GameController : MonoBehaviour
     //To read player input, we need a reference to the palce where the player types their input.
     //This variable will hold that reference.
     public InputField InputText;
+    public GameObject FruityTree;
+    public float TreePlantX;
     public List<string> SceneInventory, PlayerInventory, Command;
+    public List <int> ResourceInventory;
+    
 
     //Later on, we need to break the input into words.
     //That means splitting a string at every space: ' '
@@ -25,6 +29,8 @@ public class GameController : MonoBehaviour
     //and C# asks 'where', we can give it this variable,
     //and C# will know to split the input at the spaces.
     private char[] spaceCharacter = new[] { ' ' };
+    private int wood, stars;
+    private GameObject newTree;
 
     // Start is called before the first frame update
     void Start()
@@ -58,7 +64,9 @@ public class GameController : MonoBehaviour
                     if(chara == InputText.text)
                     {
                         InputText.text = command;
+                        InputText.MoveTextEnd(false);
                         break;
+                        
                     }
                 }
                 
@@ -87,9 +95,9 @@ public class GameController : MonoBehaviour
                 //Tell Unity to move the scrollbar in .1 seconds.
                 Invoke("MoveScrollbarToBottom", .1f);
             }
-            else if(inputWords[0]=="get")
+            else if (inputWords[0] == "get")
             {
-                if(inputWords[1] == "hat" && SceneInventory.Contains("hat"))
+                if (inputWords[1] == "hat" && SceneInventory.Contains("hat"))
                 {
                     GameObject.Find("Hat").GetComponent<SpriteRenderer>().enabled = false;
                     SceneInventory.Remove("hat");
@@ -97,7 +105,7 @@ public class GameController : MonoBehaviour
                     OutputText.text += "You pick up the hat.\n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
-                else if(inputWords[1] == "glasses" && SceneInventory.Contains("glasses"))
+                else if (inputWords[1] == "glasses" && SceneInventory.Contains("glasses"))
                 {
                     GameObject.Find("Glasses").GetComponent<SpriteRenderer>().enabled = false;
                     SceneInventory.Remove("glasses");
@@ -105,7 +113,7 @@ public class GameController : MonoBehaviour
                     OutputText.text += "You pick up the glasses.\n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
-                else if(inputWords[1] == "fish" && inputWords[2] == "net" && SceneInventory.Contains("fishNet"))
+                else if (inputWords[1] == "fish" && inputWords[2] == "net" && SceneInventory.Contains("fishNet"))
                 {
                     GameObject.Find("FishNet").GetComponent<SpriteRenderer>().enabled = false;
                     SceneInventory.Remove("fishNet");
@@ -136,12 +144,12 @@ public class GameController : MonoBehaviour
                 }
                 else
                 {
-                    OutputText.text += "You cannot get " + inputWords[1]+" here \n";
+                    OutputText.text += "You cannot get " + inputWords[1] + " here \n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
             }
             //use
-            else if(inputWords[0] == "use")
+            else if (inputWords[0] == "use")
             {
                 if (inputWords[1] == "worm" && PlayerInventory.Contains("worm"))
                 {
@@ -152,7 +160,7 @@ public class GameController : MonoBehaviour
                     PlayerInventory.Remove("worm");
 
                 }
-                else if(inputWords[1] == "fish"&& inputWords[2] == "net" && PlayerInventory.Contains("fishNet"))
+                else if (inputWords[1] == "fish" && inputWords[2] == "net" && PlayerInventory.Contains("fishNet"))
                 {
                     GameObject.Find("WormInPond").GetComponent<SpriteRenderer>().enabled = false;
                     GameObject.Find("Fish").GetComponent<SpriteRenderer>().enabled = false;
@@ -169,7 +177,7 @@ public class GameController : MonoBehaviour
                 }
             }
             //wear
-            else if(inputWords[0] == "wear")
+            else if (inputWords[0] == "wear")
             {
                 if (inputWords[1] == "hat" && PlayerInventory.Contains("hat"))
                 {
@@ -177,45 +185,96 @@ public class GameController : MonoBehaviour
                     OutputText.text += "You put the hat on your head. \n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
-                else if(inputWords[1] == "waders" && PlayerInventory.Contains("waders"))
+                else if (inputWords[1] == "waders" && PlayerInventory.Contains("waders"))
                 {
                     OutputText.text += "You put waders on. Now you can walk into water.\n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
-                else if(inputWords[1] == "glasses" && PlayerInventory.Contains("glasses"))
+                else if (inputWords[1] == "glasses" && PlayerInventory.Contains("glasses"))
                 {
                     GameObject.Find("GlassesOnHead").GetComponent<SpriteRenderer>().enabled = true;
                     OutputText.text += "You put the hat on your glasses. \n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
-                else{
+                else
+                {
                     OutputText.text += "You don't have a " + inputWords[1] + ". You can't wear you don't have. \n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                 }
             }
-            else if(inputWords[0] == "inventory")
+            //harvest
+            else if (inputWords[0] == "harvest")
+            {
+                if (inputWords[1] == "tree" && SceneInventory.Contains("tree"))
+                {
+                    
+                    Destroy(GameObject.Find("FruityTree(Clone)"));
+                    SceneInventory.Remove("tree");
+                    wood += 10;
+                    stars += 3;
+                    OutputText.text += "You gain 10 woods and 3 stars \n";
+
+                    ResourceInventory[0] = wood;
+                    ResourceInventory[1] = stars;
+
+
+                    PlayerInventory.Add("treeSeed");
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
+                else
+                {
+                    OutputText.text += "There is no  " + inputWords[1] + " you can harvest. \n";
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
+            }
+            //plant
+            else if (inputWords[0] == "plant")
+            {
+                if (inputWords[1] == "tree" && PlayerInventory.Contains("treeSeed"))
+                {
+
+                    
+                    SceneInventory.Add("tree");
+                    PlayerInventory.Remove("treeSeed");
+                    OutputText.text += "You plant a tree \n";
+                    
+                    newTree = Instantiate(FruityTree, this.transform) ;
+                    newTree.transform.position = new Vector3(Random.Range(-TreePlantX, TreePlantX), -2f, 0);
+
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
+                else
+                {
+                    OutputText.text += "You do not have " + inputWords[1] + " seed to plant.\n";
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
+            }
+            //inventory
+            else if (inputWords[0] == "inventory")
             {
                 string inventoryString = "You have: ";
-                for (int i = 0; i<PlayerInventory.Count;i++)
+                for (int i = 0; i < PlayerInventory.Count; i++)
                 {
                     inventoryString += PlayerInventory[i] + ", ";
                 }
                 OutputText.text += inventoryString + "\n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
-            else if(inputWords[0] == "look")
+            //look
+            else if (inputWords[0] == "look")
             {
                 string sceneString = "There are: ";
-                for(int i=0; i< SceneInventory.Count; i++)
+                for (int i = 0; i < SceneInventory.Count; i++)
                 {
                     sceneString += SceneInventory[i] + ", ";
                 }
                 OutputText.text += sceneString + "\n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
-            else if(inputWords[0] == "talk")
+            //talk
+            else if (inputWords[0] == "talk")
             {
-                
+
                 if (inputWords.Length > 2)
                 {
                     if (inputWords[2] == "hungry" && PlayerInventory.Contains("hungryTopic"))
