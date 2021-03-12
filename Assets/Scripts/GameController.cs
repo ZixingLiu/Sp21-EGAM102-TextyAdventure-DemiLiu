@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.U2D;
 
 public class GameController : MonoBehaviour
 {
@@ -115,20 +116,20 @@ public class GameController : MonoBehaviour
                 }
                 else if (inputWords[1] == "fish" && inputWords[2] == "net" && SceneInventory.Contains("fishNet"))
                 {
-                    GameObject.Find("FishNet").GetComponent<SpriteRenderer>().enabled = false;
+                    GameObject.Find("FishNet").GetComponent<SpriteShapeController>().enabled = false;
                     SceneInventory.Remove("fishNet");
                     PlayerInventory.Add("fishNet");
                     OutputText.text += "You pick up the fish net. You need to find an worm to attract fish.\n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
-                    SceneInventory.Add("worm");
-                    GameObject.Find("Worm").GetComponent<SpriteRenderer>().enabled = true;
+                    SceneInventory.Add("bee");
+                    GameObject.Find("Bee").GetComponent<SpriteRenderer>().enabled = true;
                     GameObject.Find("FishNetInHand").GetComponent<SpriteRenderer>().enabled = true;
                 }
                 else if (inputWords[1] == "worm" && SceneInventory.Contains("worm"))
                 {
-                    GameObject.Find("Worm").GetComponent<SpriteRenderer>().enabled = false;
-                    SceneInventory.Remove("worm");
-                    PlayerInventory.Add("worm");
+                    GameObject.Find("Bee").GetComponent<SpriteRenderer>().enabled = false;
+                    SceneInventory.Remove("bee");
+                    PlayerInventory.Add("bee");
                     OutputText.text += "You pick up the worm \n <color=yellow>Cat:Also you need to put on these waders to walk into water</color> \n";
                     Invoke("MoveScrollbarToBottom", 0.1f);
                     GameObject.Find("Waders").GetComponent<SpriteRenderer>().enabled = true;
@@ -279,10 +280,9 @@ public class GameController : MonoBehaviour
                 {
                     if (inputWords[2] == "hungry" && PlayerInventory.Contains("hungryTopic"))
                     {
-                        GameObject.Find("Cat").GetComponent<SpriteRenderer>().enabled = true;
-                        GameObject.Find("CatCry").GetComponent<SpriteRenderer>().enabled = false;
+                        
                         OutputText.text += "<color=yellow>Cat: I can give you this fishing net. Can you help me catch a fish? meow</color> \n";
-                        GameObject.Find("FishNet").GetComponent<SpriteRenderer>().enabled = true;
+                        GameObject.Find("FishNet").GetComponent<SpriteShapeController>().enabled = true;
                         PlayerInventory.Remove("hungryTopic");
                         SceneInventory.Add("fishNet");
                         Invoke("MoveScrollbarToBottom", 0.1f);
@@ -290,8 +290,7 @@ public class GameController : MonoBehaviour
                     }
                     else if (inputWords[2] == "fish" && PlayerInventory.Contains("fishTopic"))
                     {
-                        GameObject.Find("Cat").GetComponent<SpriteRenderer>().enabled = true;
-                        GameObject.Find("CatCry").GetComponent<SpriteRenderer>().enabled = false;
+                       
                         OutputText.text += "<color=yellow>Cat: Fish is my favorite food. meow</color> \n";
 
                         PlayerInventory.Remove("fishTopic");
