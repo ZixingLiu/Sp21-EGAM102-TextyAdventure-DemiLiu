@@ -373,6 +373,11 @@ public class GameController : MonoBehaviour
         else if (inputWords[0] == "south")
         {
             GetComponent<Animator>().SetTrigger("South");
+            if (SceneInventory.Contains("shadow"))
+            {
+                OutputText.text += "It's so dark in here, you can't see anything \n";
+                Invoke("MoveScrollbarToBottom", 0.1f);
+            }
         }
         else //If the player says anything else
         {
@@ -422,7 +427,7 @@ public class GameController : MonoBehaviour
                 PlayerInventory.Add("key");
                 SceneInventory.Remove("key");
                 GameObject.Find("Key").GetComponent<SpriteRenderer>().enabled = false;
-                OutputText.text += "You pick up the key \n ";
+                OutputText.text += "You pick up the key \n <color=red>Alien: On the back of the key is written that there is a treasure in the cave to the south </color>\n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
             else
@@ -445,16 +450,18 @@ public class GameController : MonoBehaviour
 
     void DoCaveStuff()
     {
+        
         if(inputWords[0] == "use")
         {
             if(inputWords[1] == "lantern" && PlayerInventory.Contains("lantern"))
             {
                 GameObject.Find("Shadow").GetComponent<SpriteRenderer>().enabled = false;
                 GameObject.Find("LanternInHand").GetComponent<SpriteRenderer>().enabled = true;
-                OutputText.text += "You  use lantern \n";
+                SceneInventory.Remove("shadow");
+                OutputText.text += "You can see things know, you need a map find the way. \n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
-            else if(inputWords[1] == "key" && PlayerInventory.Contains("key"))
+            else if(inputWords[1] == "key" && PlayerInventory.Contains("key") && SceneInventory.Contains("treasure box"))
             {
                 GameObject.Find("Coin").GetComponent<SpriteRenderer>().enabled = true;
                 GameObject.Find("Coin1").GetComponent<SpriteRenderer>().enabled = true;
@@ -463,7 +470,15 @@ public class GameController : MonoBehaviour
 
                 SceneInventory.Add("coins");
                 PlayerInventory.Remove("key");
-                OutputText.text += "You  use key \n";
+                PlayerInventory.Remove("treasure box");
+                OutputText.text += "You  use key \n <color=red>Alien: As a reward for helping me find the treasure, this half of coins is yours </color>\n";
+                Invoke("MoveScrollbarToBottom", 0.1f);
+            }
+            else if (inputWords[1] == "map" && PlayerInventory.Contains("map") && !SceneInventory.Contains("shadow"))
+            {
+                GameObject.Find("TreasureChestGold").GetComponent<SpriteRenderer>().enabled = true;
+                SceneInventory.Add("treasure box");
+                OutputText.text += "<color=red>Alien: We find the treasure box </color>\n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
             else
@@ -478,6 +493,13 @@ public class GameController : MonoBehaviour
             {
                 PlayerInventory.Add("coins");
                 SceneInventory.Remove("coins");
+                GameObject.Find("Coin").GetComponent<SpriteRenderer>().enabled = false;
+                GameObject.Find("Coin1").GetComponent<SpriteRenderer>().enabled = false;
+                GameObject.Find("Coin2").GetComponent<SpriteRenderer>().enabled = false;
+                GameObject.Find("Coin3").GetComponent<SpriteRenderer>().enabled = false;
+                OutputText.text += "You pick up coins \n";
+                Invoke("MoveScrollbarToBottom", 0.1f);
+
             }
         }
         else if(inputWords[0] == "north")
@@ -512,6 +534,14 @@ public class GameController : MonoBehaviour
                 OutputText.text += "You pick up the glasses.\n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
             }
+            else if(inputWords[1] == "map" && SceneInventory.Contains("map"))
+            {
+                GameObject.Find("Map").GetComponent<SpriteRenderer>().enabled = false;
+                SceneInventory.Remove("map");
+                PlayerInventory.Add("map");
+                OutputText.text += "You pick up the map.\n <color=red>Alien: Oh,I remember there is a strange key in northern space. Let's go and see it </color> \n";
+                Invoke("MoveScrollbarToBottom", 0.1f);
+            }
             else
             {
                 OutputText.text += "You cannot get " + inputWords[1] + " here \n";
@@ -536,6 +566,26 @@ public class GameController : MonoBehaviour
             {
                 OutputText.text += "You don't have a " + inputWords[1] + ". You can't wear you don't have. \n";
                 Invoke("MoveScrollbarToBottom", 0.1f);
+            }
+        }
+        else if(inputWords[0] == "talk")
+        {
+            if(inputWords[1] == "alien" )
+            {
+                if(inputWords.Length < 3)
+                {
+                    OutputText.text += "<color=red>Alien: I  come to the Earth to find <b>treasure</b>, and I am looking for someone to go with me </color>\n";
+                    PlayerInventory.Add("treasureTopic");
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
+                else if (inputWords[2] == "treasure" && PlayerInventory.Contains("treasureTopic"))
+                {
+                    OutputText.text += "<color=red>Alien: It's very kind of you to help. Here is the teasure map. </color>\n";
+                    PlayerInventory.Remove("treasureTopic");
+                    SceneInventory.Add("map");
+                    GameObject.Find("Map").GetComponent<SpriteRenderer>().enabled = true;
+                    Invoke("MoveScrollbarToBottom", 0.1f);
+                }
             }
         }
         else if (inputWords[0] == "west")
