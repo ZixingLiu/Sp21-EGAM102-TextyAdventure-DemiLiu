@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
     //This variable will hold that reference.
     public InputField InputText;
     public GameObject FruityTree;
+    public GameObject slime;
     public float TreePlantX;
     public List<string> SceneInventory, PlayerInventory, Command;
     public List <int> ResourceInventory;
@@ -36,6 +37,8 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        slime = GameObject.Find("Slime");
+
         //Print starting text. So the player knows the game has started.
         OutputText.text = "The game is afoot! \n";
         //Move the scrollbar to the end .. after a small delay.
@@ -43,6 +46,7 @@ public class GameController : MonoBehaviour
         //printing text, the UI system will get confused.
         //So, move the scrollbar, but with a .1 second delay.
         Invoke("MoveScrollbarToBottom", .1f);
+
     }
 
     void MoveScrollbarToBottom()
@@ -322,6 +326,26 @@ public class GameController : MonoBehaviour
                     }
                 }
 
+
+            }
+            else if(inputWords[0] == "slime")
+            {
+                if(inputWords[1] == "sit")
+                {
+                    slime.GetComponent<Animator>().SetTrigger("Sit");
+                }
+                else if(inputWords[1] == "jump")
+                {
+                    slime.GetComponent<Animator>().SetTrigger("Jump");
+                }
+                else if (inputWords[1] == "float")
+                {
+                    slime.GetComponent<Animator>().SetTrigger("Float");
+                }
+                else if (inputWords[1] == "shake")
+                {
+                    slime.GetComponent<Animator>().SetTrigger("Shake");
+                }
             }
             else //If the player says anything else
             {
